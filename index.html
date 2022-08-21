@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	
+	<title>INFA - CSV Parser</title>
+   <style>
+    table {
+            font-size: 10px;
+            table-layout:auto;
+        }
+		td, th{
+			-ms-word-wrap: break-word;
+			word-wrap: break-word;
+			word-break: break-all;
+		}
+   </style>
+</head>
+<body>
+	<div class="mb-3 container mt-3 p-3" style="background-color: #ffb64f;">
+		<div class="text-center fw-bolder fs-5">CSV Parser</div>
+		<marquee direction="right">@Author - Tapas Sahu</marquee>
+		<div id="hid">
+		<label for="formFile" class="form-label fw-bold" >Chose a CSV file to Parse:</label>
+		<input class="form-control form-control-sm" type="file" name="inputfile" id="inputfile">
+		<div class="align-items-center mt-2" id="spin1" hi>
+			<b>Parsing...</n>
+			<div class=" d-flex spinner-border ms-auto" role="status" aria-hidden="true"></div>
+		  </div>
+	</div>
+	</div>
+	<div id="output"></div>
+	
+<script>
+	const page=10000;
+	var current=1;
+	var totalPaginator=1;
+	var str;
+	var filename;
+	var x,y;
+	var header;
+	var fr=new FileReader();
+	function previous(){
+		//console.log(performance.memory)
+		current--;
+		decider();
+	}
+	function next(){
+		//console.log(performance.memory)
+		current++;
+		decider();
+	}
+	document.getElementById('inputfile').addEventListener('change', function() 
+	{
+			filename=this.files[0];
+			fr.onload=function()
+			{
+				str=fr.result;
+				str=str.replaceAll('"','');
+				y=str.split('\n');
+				header=y[0].split(',');
+				totalPaginator=y.length/page;
+				y=y.length
+				str=""
+				decider();
+			}
+			fr.readAsText(this.files[0]);
+			
+	});
+	function fileReader(limit){
+		
+	}
+	function decider(){
+		var num=current;
+		fr.onload=function()
+		{
+			str=fr.result;
+			str=str.replaceAll('"','');
+			str=str.replaceAll('>','&gt;');
+			str=str.replaceAll('<','&lt;');
+	//		if(current==1)
+			x=str.split('\n',(num*page)+1);
+/* 			else
+			x=str.split('\n',num*page); */
+			var z=header.length;
+			var res="<div class=\"table-responsive ml-2 mr-2\">\r\n    <table class=\"table table-fixed table-sm caption-top table-striped table-hover\">\r\n        <caption  style=\"background-color: #ffb64f;\" class=\"text-dark mb-1 mt-1 fs-5 fw-bold\">"+document.getElementById('inputfile').value+" | "+(y-1)+" Lines found! <div class=\"d-grid  d-md-flex justify-content-md-end\" id=\"pagination\">\r\n\t\t<button onclick=\"previous();\" id=\"previous\" class=\"btn btn-sm btn-secondary me-md-2\" type=\"button\">&lt;<\/button>\r\n\t\t<button onclick=\"next();\" id=\"next\" class=\"btn btn-sm btn-secondary me-md-3\" type=\"button\">&gt;<\/button>\r\n\t\t<\/div> <\/caption>\r\n        <thead class=\"table-dark\" >\r\n          <tr>";
+			res+="<th  width=\""+100/z+"%\" scope=\"col\">#<\/th>";
+			header.forEach(element => 
+			{
+				res+="<th width=\""+100/(z+1)+"%\" scope=\"col\">"+element+"<\/th>";
+			});
+					res+="<\/tr>\r\n        <\/thead>\r\n        <tbody>";
+			var end=page;
+			var begin;
+			begin=(page*num)-page+1;
+			if(current>=totalPaginator)
+			end=x.length;
+			else
+			end=(page*num)+1;
+			for (let i = begin; i < end; i++)
+					{
+						//console.log(i);
+						row=x[i].split(',');
+						res+="<tr>";
+						res+="<td>"+i+"<\/td>";
+						row.forEach(element => {
+							res+="<td>"+element+"<\/td>";
+						});
+						res+="<\/tr>\r\n";
+					}
+			res+="<\/tbody>\r\n      <\/table>\r\n    <\/div>";
+			document.getElementById('hid').style.display="none";
+			document.getElementById("output").innerHTML=res;
+			res="";
+			str="";
+			row="";
+			checker();
+			x="";
+	}
+	fr.readAsText(filename);
+	}
+	function checker(){
+		//alert(totalPaginator);
+		if(totalPaginator<=1){
+			document.getElementById('previous').style.display="none";
+			document.getElementById('next').style.display="none";
+		}
+		else if(current==1)
+		document.getElementById('previous').style.display="none";
+		else if(current>=totalPaginator)
+		document.getElementById('next').style.display="none";
+	}
+   </script>
+</body>
+</html>
